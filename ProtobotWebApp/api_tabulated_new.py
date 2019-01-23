@@ -6,6 +6,8 @@ import threading
 
 def rawtab():
     indicator = False
+    interval_seconds = 60
+    trading_pairs = ['BTCUSDT']
     while True:
         for pair in trading_pairs:
             kline = client.get_klines(symbol=pair, interval='1m', limit=10)
@@ -31,6 +33,10 @@ def rawtab():
             rawtable[len(rawtable) - 1]['indicator']  = str(indicator)
             rawtable[len(rawtable) - 1]['10-SMA']  = str(tenSMA)
             rawtable[len(rawtable) - 1]['20-SMA']  = str(twentySMA)
+        else:
+            rawtable[len(rawtable) - 1]['indicator']  = str(indicator)
+            rawtable[len(rawtable) - 1]['10-SMA']  = 0
+            rawtable[len(rawtable) - 1]['20-SMA']  = 0
 
 
         print(rawtable)
@@ -42,7 +48,7 @@ def write_to_csv(entry):
         print("Setting the Table")
         tab = pd.DataFrame(entry).reindex(columns = labels)
         file = open('rawtab.csv', 'a')
-        tab.to_csv(file , mode= 'a', header= False)
+        tab.to_csv(file , mode= 'a', header= False )
         file.close()
 
 def calcMovAvg(rawtable):
@@ -63,9 +69,7 @@ api_key = 'cPm5GZKAa60eT8cvkMbrhkvQN9ZkYPCDDS9sJ9VHgceOdXPHYsJcEqsmCaSIFJjr'#gen
 api_secret = 'SBv8xWd1hu0djnFYZjE9lJJNROohaeyDyyAJdGp7htK64uPcALWJTS4L2swjFUac'#generated from binance
 client = Client(api_key,api_secret)
 
-interval_seconds = 60
-trading_pairs = ['BTCUSDT']
-threads = list()
+
 rawtable = list()  # shared resource
 
 # this function get_klines returns a kline with a list of:
