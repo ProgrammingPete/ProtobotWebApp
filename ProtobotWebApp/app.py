@@ -3,7 +3,7 @@ This script runs the application using a development server.
 It contains the definition of routes and views for the application.
 """
 
-from flask import Flask, jsonify, redirect, url_for, request
+from flask import Flask, jsonify, redirect, url_for, request, render_template
 import api_tabulated_new
 import _thread
 import threading
@@ -15,7 +15,7 @@ wsgi_app = app.wsgi_app
 @app.route('/')
 def hello():
     """Renders a sample page."""
-    return "This is a test page"
+    return render_template('login.html')
 
 @app.route('/api/v1.0/update', methods=['GET'])
 def get_tasks():

@@ -33,8 +33,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="rawtab.csv" />
     <Content Include="requirements.txt" />
-    <Content Include="login.html" />
+    <Content Include="templates\login.html" />
   </ItemGroup>
   <ItemGroup>
     <Interpreter Include="env\">
@@ -49,6 +50,9 @@
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="Global|PythonCore|3.6" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="templates\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.Web.targets" />
   <!-- Specify pre- and post-build commands in the BeforeBuild and 
