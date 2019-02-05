@@ -29,11 +29,15 @@ def success(name):
 @app.route('/api/v1.0/login', methods = ['POST', 'GET'])
 def login():
    if request.method == 'POST':
-      user = request.form['nm']
-      return redirect(url_for('success',name = user))
+      user = request.form['user_name']
+      password = request.form['user_password']
+
+      if (authentication.validation(user, password)) == 1:
+        return ('%s Login Successful', % user) 
+      else:
+        return ('Login Unsuccesful, Please try again')
    else:
-      user = request.args.get('nm')
-      return redirect(url_for('success',name = user))
+      return 'fail'
 
 @app.route('/api/v1.0/create', methods = ['POST', 'GET'])
 def create():
@@ -56,3 +60,4 @@ if __name__ == '__main__':
     rawTab = threading.Thread(target= api_tabulated_new.rawtab, name = 'Table')
     rawTab.start()
     app.run(HOST, 5678, debug = True)
+    print(authentication.credentialStorage)
