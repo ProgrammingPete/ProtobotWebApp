@@ -33,7 +33,7 @@ def login():
       password = request.form['user_password']
 
       if (authentication.validation(user, password)) == 1:
-        return ('%s Login Successful', % user) 
+        return ('%s Login Successful' %user) 
       else:
         return ('Login Unsuccesful, Please try again')
    else:
