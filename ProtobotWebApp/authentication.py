@@ -11,7 +11,7 @@ def createUser(userName, password):
 
 def validation(username, password):
 	compareValue = bcrypt.hashpw(password.encode('utf-8'), credentialStorage[username]['salt'])
-
+	#Need to add section here to catch keyerrors i.e. the user does not exist
 	if compareValue == credentialStorage[username]['hashValue']:
 		return 1
 	else:
