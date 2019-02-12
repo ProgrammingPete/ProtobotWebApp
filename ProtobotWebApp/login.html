@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href='https://fonts.googleapis.com/css?family=Roboto+Slab' rel='stylesheet' type='text/css'>
+</head>
+<style type="text/css">
+	img {
+		max-width: 45%;
+		max-height: 40%;
+		height: auto;
+		width: auto;
+	}
+	html { 
+	display: table;
+	margin: auto; 
+	}
+	body {
+		display: table-cell;
+		vertical-align: middle;
+		text-align: center;
+	}
+	li {
+		text-align: left;
+	}
+</style>
+<body>
+<form action = "http://localhost:5678/api/v1.0/login" method="post">
+	<div>
+		<label for="name">Username:</label>
+		<input type="text" id="name" name="user_name"/>
+	</div>
+	<div>
+		<label for="password">Password:</label>
+		<input type="text" id="password" name="user_password" />
+	</div>
+	<div>
+		<button>Login</button>
+	</div>
+
+</body>
+</html>
