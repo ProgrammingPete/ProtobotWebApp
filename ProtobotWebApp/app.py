@@ -9,6 +9,8 @@ import _thread
 import threading
 app = Flask(__name__)
 import authentication
+import flask_sqlalchemy
+
 
 # Make the WSGI interface available at the top level so wfastcgi can get it.
 wsgi_app = app.wsgi_app
