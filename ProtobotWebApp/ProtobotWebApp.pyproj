@@ -33,7 +33,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="rawtab.csv" />
     <Content Include="requirements.txt" />
     <Content Include="templates\login.html" />
   </ItemGroup>
