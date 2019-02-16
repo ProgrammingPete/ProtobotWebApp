@@ -1,5 +1,6 @@
 import os
 import bcrypt
+from app import User
 
 credentialStorage= {}
 

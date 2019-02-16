@@ -31,9 +31,13 @@
     <Compile Include="api_tabulated_new.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="authentication.py" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="createUser.html" />
+    <Content Include="login.html" />
     <Content Include="requirements.txt" />
+    <Content Include="templates\createUser.html" />
     <Content Include="templates\login.html" />
   </ItemGroup>
   <ItemGroup>

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -25,18 +25,21 @@
 	}
 </style>
 <body>
-<form action = "http://localhost:5678/api/v1.0/login" method="post">
-	<div>
-		<label for="name">Username:</label>
-		<input type="text" id="name" name="user_name"/>
-	</div>
-	<div>
-		<label for="password">Password:</label>
-		<input type="text" id="password" name="user_password" />
-	</div>
-	<div>
-		<button>Login</button>
-	</div>
-
+    <form action="http://localhost:5678/api/v1.0/login" method="post">
+        <div>
+            <label for="name">Username:</label>
+            <input type="text" id="name" name="user_name" />
+        </div>
+        <div>
+            <label for="password">Password:</label>
+            <input type="text" id="password" name="user_password" />
+        </div>
+        <div>
+            <button>Login</button>
+        </div>
+    </form>
+    <form action="http://localhost:5678/createUser">
+        <button>New User? </button>
+    </form>
 </body>
 </html>

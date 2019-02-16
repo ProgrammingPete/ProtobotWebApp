@@ -7,10 +7,27 @@ from flask import Flask, jsonify, redirect, url_for, request, render_template
 import api_tabulated_new
 import _thread
 import threading
-app = Flask(__name__)
-import authentication
-import flask_sqlalchemy
+from flask_sqlalchemy import SQLAlchemy
 
+
+import os
+app = Flask(__name__)
+basedir = os.path.abspath(os.path.dirname(__file__))
+#configuration
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'app.db')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False #signals the app every time a change is made to db
+db = SQLAlchemy(app)
+
+class User(db.Model):
+    """Class representation of a Client"""
+    username = db.Column(db.String(120), index = True, unique = True, primary_key = True)
+    hashvalue = db.Column(db.String(128)) #assumed at the moment to be 128
+    password_salt = db.Column(db.String(128))
+
+    def __repr__(self): #tells how python should represent the object
+        return '<User {}>'.format(self.username)
+
+import authentication
 
 # Make the WSGI interface available at the top level so wfastcgi can get it.
 wsgi_app = app.wsgi_app
@@ -19,6 +36,10 @@ wsgi_app = app.wsgi_app
 def hello():
     """Renders a sample page."""
     return render_template('login.html')
+
+@app.route('/createUser')
+def CreateUser():
+    return render_template('createUser.html')
 
 @app.route('/api/v1.0/update', methods=['GET'])
 def get_tasks():
@@ -51,13 +72,9 @@ def create():
   else:
     return 'fail'
 
-if __name__ == '__main__':
-    import os
+if __name__ == '__main__':   
     HOST = os.environ.get('SERVER_HOST', 'localhost')
-    try:
-        PORT = int(os.environ.get('SERVER_PORT', '5678'))
-    except ValueError:
-        PORT = 5555
+
     rawTab = threading.Thread(target= api_tabulated_new.rawtab, name = 'Table')
     rawTab.start()
     app.run(HOST, 5678, debug = True)
