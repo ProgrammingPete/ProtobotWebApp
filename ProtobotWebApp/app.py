@@ -22,7 +22,7 @@ class User(db.Model):
     """Class representation of a Client"""
     username = db.Column(db.String(120),  unique = True, primary_key = True, nullable= False)
     hashvalue = db.Column(db.String(61),  nullable = False) #60 byte hash
-    password_salt = db.Column(db.String(30), nullable = False) # 29 byte salt (in )
+    password_salt = db.Column(db.String(30), nullable = False) # 29 byte salt
 
     def __repr__(self): #tells how python should represent the object
         return '<User {}>'.format(self.username)
