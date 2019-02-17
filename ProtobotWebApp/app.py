@@ -20,9 +20,9 @@ db = SQLAlchemy(app)
 
 class User(db.Model):
     """Class representation of a Client"""
-    username = db.Column(db.String(120), index = True, unique = True, primary_key = True)
-    hashvalue = db.Column(db.String(128)) #assumed at the moment to be 128
-    password_salt = db.Column(db.String(128))
+    username = db.Column(db.String(120),  unique = True, primary_key = True, nullable= False)
+    hashvalue = db.Column(db.String(61),  nullable = False) #60 byte hash
+    password_salt = db.Column(db.String(30), nullable = False) # 29 byte salt (in )
 
     def __repr__(self): #tells how python should represent the object
         return '<User {}>'.format(self.username)

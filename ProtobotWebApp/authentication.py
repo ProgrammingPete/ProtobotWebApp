@@ -8,6 +8,9 @@ def createUser(userName, password):
 	salt = bcrypt.gensalt()
 	hashValue = bcrypt.hashpw(password.encode('utf-8'), salt)
 	credentialStorage[userName] = {'hashValue': hashValue, 'salt': salt}
+	print(credentialStorage)
+	print('length of hashval: ', len(credentialStorage[userName]['hashValue'].decode('utf-8')))
+	print('length of salt: ', len(credentialStorage[userName]['salt'].decode('utf-8')))
 
 
 def validation(username, password):
