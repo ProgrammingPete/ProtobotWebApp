@@ -1,6 +1,16 @@
 """
-This script runs the application using a development server.
-It contains the definition of routes and views for the application.
+This is the script that will hold teh View, Models ,a nd the routes for the application.
+THis will be changed in the future, if the code becomes to messy.
+
+How to use the database: 
+If you change the schema, you will need to update the db file in a python shell:
+    from app import db
+    from app import User
+    db.drop_all()
+    db.create_all()
+
+    Make a query:
+        User.query
 """
 
 from flask import Flask, jsonify, redirect, url_for, request, render_template

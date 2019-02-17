@@ -1,17 +1,19 @@
 import os
 import bcrypt
 from app import User
+from app import db
 
 credentialStorage= {}
 
 def createUser(userName, password):
-	salt = bcrypt.gensalt()
-	hashValue = bcrypt.hashpw(password.encode('utf-8'), salt)
-	credentialStorage[userName] = {'hashValue': hashValue, 'salt': salt}
-	print(credentialStorage)
-	print('length of hashval: ', len(credentialStorage[userName]['hashValue'].decode('utf-8')))
-	print('length of salt: ', len(credentialStorage[userName]['salt'].decode('utf-8')))
+    salt = bcrypt.gensalt()
+    hashValue = bcrypt.hashpw(password.encode('utf-8'), salt)
+    credentialStorage[userName] = {'hashValue': hashValue, 'salt': salt}
 
+    #add to database
+    newUser = User(username = userName, hashvalue = hashValue.decode('utf-8'), password_salt = salt.decode('utf-8'))
+    db.session.add(newUser)
+    db.session.commit()
 
 def validation(username, password):
 	compareValue = bcrypt.hashpw(password.encode('utf-8'), credentialStorage[username]['salt'])
