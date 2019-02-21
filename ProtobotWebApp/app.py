@@ -44,11 +44,11 @@ wsgi_app = app.wsgi_app
 
 @app.route('/')
 def hello():
-    """Renders a sample page."""
+    """Renders a login page."""
     return render_template('login.html')
 
-@app.route('/createUser')
-def CreateUser():
+@app.route('/api/v1.0/createUser', methods=['POST'])
+def createUser():
     return render_template('createUser.html')
 
 @app.route('/api/v1.0/update', methods=['GET'])
@@ -70,7 +70,7 @@ def login():
       else:
         return ('Login Unsuccesful, Please try again')
    else:
-      return 'fail'
+      return '400 Error'
 
 @app.route('/api/v1.0/create', methods = ['POST', 'GET'])
 def create():
@@ -79,8 +79,10 @@ def create():
     password = request.form['user_password']
     authentication.createUser(user, password)
     return ('%s User Created' %user)
+    time.sleep(5)
+    return render_template('login.html')
   else:
-    return 'fail'
+    return '400 Error'
 
 if __name__ == '__main__':   
     HOST = os.environ.get('SERVER_HOST', 'localhost')
