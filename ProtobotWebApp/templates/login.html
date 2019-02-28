@@ -4,7 +4,7 @@
 		<meta charset="utf-8">
 		<title>Form for Login</title>
 		<link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-		<link rel="stylesheet" type="text/css" href="style.css">
+		<link rel="stylesheet" type="text/css" href={{ url_for('static', filename='style.css') }}>
 		<!-- //<link rel="icon" href="favicon.gif" type="image/png"> -->
 		<!-- //<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"> -->
 		<!-- //<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"> -->
@@ -22,24 +22,29 @@
 		<center><IMG SRC="template.jpg" ALT="some text" WIDTH=400 HEIGHT=85></center>
 		
 	</div>
-	
-	<div class="loginbox">
-		<h1>Login</h1>
-		<div class="textbox">	
-			<i class="fas fa-user" aria-hidden="true"></i>
-			<input type="text" placeholder="Username" style="color: white;" name="" value="">
+	<form action="http://localhost:5678/api/v1.0/login" method="post">
+		<div class="loginbox">
+			<h1>Login</h1>
+			<div class="textbox">	
+				<i class="fas fa-user" aria-hidden="true"></i>
+				<input type="text" placeholder="Username" style="color: white;" name="user_name" value="">
+			</div>
+			
+			<div class="textbox">	
+				<i class="fas fa-lock"></i>
+				<input type="password" placeholder="Password" name="user_password" value="">
+			</div>
+			
+			<input class="btn" type="button" name="" value="Sign In">
+	</form>
+	<form action="http://localhost:5678/api/v1.0/createUser" method="post">
+			<!--<input class="btn" type="button" name="" value="Create Account">-->
+			<input class="btn2" type="submit" name="" value="Register Here!">
+			
+		</form>
+			<input type="button" class="btn" name="" value="Forgot Password?">
+			
 		</div>
-		
-		<div class="textbox">	
-			<i class="fas fa-lock"></i>
-			<input type="password" placeholder="Password" name="" value="">
-		</div>
-		
-		<input class="btn" type="button" name="" value="Sign In">
-		<input class="btn2" type="button" name="" value="Register Here!">
-		<input type="button" name="" value="Forget Password?">
-		
-	</div>
 </body>
 
 </html>
