@@ -9,11 +9,13 @@ def createUser(userName, password):
     salt = bcrypt.gensalt()
     hashValue = bcrypt.hashpw(password.encode('utf-8'), salt)
     credentialStorage[userName] = {'hashValue': hashValue, 'salt': salt}
-
-    #add to database
-    newUser = User(username = userName, hashvalue = hashValue, password_salt = salt)
-    db.session.add(newUser)
-    db.session.commit()
+    try:
+        #add to database
+        newUser = User(username = userName, hashvalue = hashValue, password_salt = salt)
+        db.session.add(newUser)
+        db.session.commit()
+    except IntergrityError:
+        return 0
 
 def validation(username, password):
     try:

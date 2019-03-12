@@ -77,7 +77,10 @@ def create():
   if request.method == 'POST':
     user = request.form['user_name']
     password = request.form['user_password']
-    authentication.createUser(user, password)
+    if (authentication.createUser(user, password)) == 1:
+        return ('%s Login Successful' %user) 
+    else:
+        return ('User creation Unsuccesful, Please try again')
     return ('%s User Created' %user)
     time.sleep(5)
     return render_template('login.html')
