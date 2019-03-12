@@ -1,5 +1,6 @@
 import os
 import bcrypt
+import sqlalchemy
 from app import User
 from app import db
 
@@ -14,7 +15,7 @@ def createUser(userName, password):
         newUser = User(username = userName, hashvalue = hashValue, password_salt = salt)
         db.session.add(newUser)
         db.session.commit()
-    except IntegrityError:
+    except sqlalchemy.exc.IntegrityError:
         return 0
 
 def validation(username, password):

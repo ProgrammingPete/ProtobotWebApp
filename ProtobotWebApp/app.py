@@ -80,7 +80,7 @@ def create():
     if (authentication.createUser(user, password)) == 1:
         return ('%s Login Successful' %user) 
     else:
-        return ('User creation Unsuccesful, Please try again')
+        return ('User creation  failed, %s already exists, try again' %user)
     return ('%s User Created' %user)
     time.sleep(5)
     return render_template('login.html')
