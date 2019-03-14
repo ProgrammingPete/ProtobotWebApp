@@ -15,6 +15,7 @@ def createUser(userName, password):
         newUser = User(username = userName, hashvalue = hashValue, password_salt = salt)
         db.session.add(newUser)
         db.session.commit()
+        return 1
     except sqlalchemy.exc.IntegrityError:
         return 0
 
