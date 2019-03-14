@@ -92,4 +92,4 @@ if __name__ == '__main__':
 
     rawTab = threading.Thread(target= api_tabulated_new.rawtab, name = 'Table')
     rawTab.start()
-    app.run(HOST, 5678, debug = True)
+    app.run(host='0.0.0.0', 80)
