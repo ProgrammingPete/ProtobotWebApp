@@ -63,14 +63,14 @@ img{
 	border-bottom: 1px solid #ffA500;
 	color: white;
 }
-
 .textbox i{
 	width: 26px;
 	float: left;
 	text-align: center;
 	color: white;
-	
-}
+	}
+
+
 
 .textbox input{
 	border: none;
