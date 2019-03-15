@@ -18,10 +18,13 @@ import api_tabulated_new
 import _thread
 import threading
 from flask_sqlalchemy import SQLAlchemy
+from flask_cors import CORS
 
 
 import os
 app = Flask(__name__)
+cors = CORS(app, supports_credentials=True)
+
 basedir = os.path.abspath(os.path.dirname(__file__))
 #configuration
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'app.db')
@@ -42,22 +45,27 @@ import authentication
 # Make the WSGI interface available at the top level so wfastcgi can get it.
 wsgi_app = app.wsgi_app
 
+
 @app.route('/')
 def hello():
     """Renders a login page."""
     return render_template('login.html')
 
+
 @app.route('/api/v1.0/createUser', methods=['POST'])
 def createUser():
     return render_template('createUser.html')
+
 
 @app.route('/api/v1.0/update', methods=['GET'])
 def get_tasks():
     return jsonify({'Trading Info': api_tabulated_new.rawtable})
 
+
 @app.route('/api/v1.0/success/<name>')
 def success(name):
    return 'welcome %s' % name
+
 
 @app.route('/api/v1.0/login', methods = ['POST', 'GET'])
 def login():
@@ -72,20 +80,27 @@ def login():
    else:
       return '400 Error'
 
+
 @app.route('/api/v1.0/create', methods = ['POST', 'GET'])
 def create():
   if request.method == 'POST':
     user = request.form['user_name']
     password = request.form['user_password']
     if (authentication.createUser(user, password)) == 1:
-        return ('%s Login Successful' %user) 
+        response = redirect('http://localhost:5678/login')
+        response.headers.add('Access-Control-Allow-Origin', "http://localhost:5678/*")
+        return response
     else:
         return ('User creation  failed, %s already exists, try again' %user)
+        response = flask.jsonify('http://127.0.0.1:3000/login')
+        response.headers.add('Access-Control-Allow-Origin', "http://localhost:5678/*")
+        return response
     return ('%s User Created' %user)
     time.sleep(5)
     return render_template('login.html')
   else:
     return '400 Error'
+
 
 if __name__ == '__main__':   
     HOST = os.environ.get('SERVER_HOST', 'localhost')
