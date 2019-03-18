@@ -17,6 +17,7 @@ def createUser(userName, password):
         db.session.commit()
         return 1
     except sqlalchemy.exc.IntegrityError:
+        print("error here")
         return 0
 
 def validation(username, password):

@@ -87,9 +87,9 @@ def create():
   else:
     return '400 Error'
 
-if __name__ == '__main__':   
-    HOST = os.environ.get('SERVER_HOST', 'localhost')
+HOST = os.environ.get('SERVER_HOST', 'localhost')
 
-    rawTab = threading.Thread(target= api_tabulated_new.rawtab, name = 'Table')
-    rawTab.start()
-    app.run(host='0.0.0.0', port='80')
+rawTab = threading.Thread(target= api_tabulated_new.rawtab, name = 'Table')
+rawTab.start()
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port='5678')
