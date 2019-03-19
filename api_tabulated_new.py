@@ -12,7 +12,7 @@ def rawtab():
         for pair in trading_pairs:
             kline = client.get_klines(symbol=pair, interval='1m', limit=10)
             entry = dict()
-            entry['trading pair'] = pair
+            entry['trading_pair'] = pair
             kline[0][0] = datetime.utcfromtimestamp((kline[0][0]/1000) - 5*3600).strftime('%Y/%m/%d %H:%M:%S')
             kline[0][6] = datetime.utcfromtimestamp((kline[0][6]/1000) - 5*3600).strftime('%Y/%m/%d %H:%M:%S')
 
@@ -82,7 +82,7 @@ rawtable = list()  # shared resource
 # close time
 # Taker buy base asset volume: Volume of the first part of the pair (BTC)
 # Taker buy quote asset volume : Volume of the second part of the pair (USDT)
-labels = ['Open Time','Open Price','High', 'Low', 'Close Price',
-          'Volume', 'Close time', 'Quote asset volume','Number Of Trades',
-          'Taker buy base', 'Taker buy quote' ]
+labels = ['Open_Time','Open_Price','High', 'Low', 'Close_Price',
+          'Volume', 'Close_time', 'Quote_asset_volume','Number_Of_Trades',
+          'Taker_buy_base', 'Taker_buy_quote' ]
 
