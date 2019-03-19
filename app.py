@@ -88,7 +88,7 @@ def create():
     password = request.form['user_password']
     if (authentication.createUser(user, password)) == 1:
         response = redirect('https://pbot2.azurewebsites.net/data')
-     
+        return response 
     else:
         return ('User creation  failed, %s already exists, try again' %user)
     return ('%s User Created' %user)
