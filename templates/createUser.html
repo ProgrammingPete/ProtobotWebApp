@@ -1,0 +1,27 @@
+﻿<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Form for Login</title>
+		<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+		
+	</head>
+<body>
+	<div class="loginbox">
+		<h1>Create Account</h1>
+		<form action="http://168.61.209.236:5678/api/v1.0/create" method="post">
+			<div class="textbox">	
+				<i class="fas fa-user" aria-hidden="true"></i>
+				<input type="text" placeholder="Username" name="user_name">
+			</div>
+			
+			<div class="textbox">	
+				<i class="fas fa-lock"></i>
+				<input type="password" placeholder="Password" name="user_password">
+			</div>
+			<input class="btn" type="submit" name="" value="Create Account">
+		</form>
+	</div>
+</body>
+
+</html>

@@ -1,7 +1,0 @@
-flask
-python-binance
-bcrypt
-flask-sqlalchemy
-pandas
-sqlite
-reactJS
