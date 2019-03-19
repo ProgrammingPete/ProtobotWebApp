@@ -87,14 +87,10 @@ def create():
     user = request.form['user_name']
     password = request.form['user_password']
     if (authentication.createUser(user, password)) == 1:
-        response = redirect('http://localhost:5678/login')
-        response.headers.add('Access-Control-Allow-Origin', "http://localhost:5678/*")
-        return response
+        response = redirect('https://pbot2.azurewebsites.net/data')
+     
     else:
         return ('User creation  failed, %s already exists, try again' %user)
-        response = flask.jsonify('http://127.0.0.1:3000/login')
-        response.headers.add('Access-Control-Allow-Origin', "http://localhost:5678/*")
-        return response
     return ('%s User Created' %user)
     time.sleep(5)
     return render_template('login.html')
