@@ -59,7 +59,7 @@ def createUser():
 
 @app.route('/api/v1.0/update', methods=['GET'])
 def get_tasks():
-    return jsonify({'Trading Info': api_tabulated_new.rawtable})
+    return jsonify({'Trading_Info': api_tabulated_new.rawtable})
 
 
 @app.route('/api/v1.0/success/<name>')
@@ -101,4 +101,5 @@ def create():
 rawTab = threading.Thread(target= api_tabulated_new.rawtab, name = 'Table')
 rawTab.start()
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port='5678')
+    app.config['TESTING'] = True
+    app.run(host='0.0.0.0', port='8000', debug = True)
