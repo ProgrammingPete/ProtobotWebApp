@@ -46,20 +46,9 @@ import authentication
 wsgi_app = app.wsgi_app
 
 
-@app.route('/')
-def hello():
-    """Renders a login page."""
-    return render_template('login.html')
-
-
-@app.route('/api/v1.0/createUser', methods=['POST'])
-def createUser():
-    return render_template('createUser.html')
-
-
 @app.route('/api/v1.0/update', methods=['GET'])
 def get_tasks():
-    return jsonify({'Trading Info': api_tabulated_new.rawtable})
+    return jsonify({'Trading_Info': api_tabulated_new.rawtable})
 
 
 @app.route('/api/v1.0/success/<name>')
@@ -70,32 +59,26 @@ def success(name):
 @app.route('/api/v1.0/login', methods = ['POST', 'GET'])
 def login():
    if request.method == 'POST':
-      user = request.form['user_name']
-      password = request.form['user_password']
-
+      userdata = request.get_json()
+      user = userdata.get('email')
+      password = userdata.get('password')
       if (authentication.validation(user, password)) == 1:
-        return ('%s Login Successful' %user) 
+        return redirect('https://pbot2.azurewebsites.net/data') 
       else:
-        return ('Login Unsuccesful, Please try again')
-   else:
-      return '400 Error'
+        return redirect('https://pbot2.azurewebsites.net/failure')
 
 
 @app.route('/api/v1.0/create', methods = ['POST', 'GET'])
 def create():
   if request.method == 'POST':
-    user = request.form['user_name']
-    password = request.form['user_password']
+    userdata = request.get_json()
+    user = userdata.get('email')
+    password = userdata.get('password')
     if (authentication.createUser(user, password)) == 1:
-        response = redirect('https://pbot2.azurewebsites.net/data')
+        response = redirect('https://pbot2.azurewebsites.net/login')
         return response 
     else:
-        return ('User creation  failed, %s already exists, try again' %user)
-    return ('%s User Created' %user)
-    time.sleep(5)
-    return render_template('login.html')
-  else:
-    return '400 Error'
+        return redirect('https://pbot2.azurewebsites.net/failure')
 
 
 rawTab = threading.Thread(target= api_tabulated_new.rawtab, name = 'Table')

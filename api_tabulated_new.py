@@ -57,7 +57,7 @@ def calcMovAvg(rawtable):
         j = length / 2
         for i, entry in enumerate(rawtable):
             div2i = i / 2
-            total += float(entry['Close Price'])
+            total += float(entry['Close_Price'])
             if j == (i + 1):
                 #print("i // 2: ",  i / 2)
                 averageMov_ten = total / j
