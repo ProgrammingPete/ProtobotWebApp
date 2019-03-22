@@ -3,3 +3,6 @@ python-binance
 bcrypt
 flask-sqlalchemy
 pandas
+flask_cors
+locustio
+gunicorn
