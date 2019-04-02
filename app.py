@@ -63,11 +63,11 @@ def login():
       user = userdata.get('email')
       password = userdata.get('password')
       if (authentication.validation(user, password)) == 1:
-        response = redirect('https://https://pbot.azurewebsites.net/data')
+        response = redirect('https://pbot.azurewebsites.net/data')
         response.headers.add('Access-Control-Allow-Origin', '*')
         return response
       else:
-        response = redirect('https://https://pbot.azurewebsites.net/loginFailure')
+        response = redirect('https://pbot.azurewebsites.net/loginFailure')
         response.headers.add('Access-Control-Allow-Origin', '*')
         return response
 
