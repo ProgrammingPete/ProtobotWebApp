@@ -63,9 +63,11 @@ def login():
       user = userdata.get('email')
       password = userdata.get('password')
       if (authentication.validation(user, password)) == 1:
-        return redirect('https://pbot2.azurewebsites.net/data') 
+        response = 'Success'
+        return jsonify(response) 
       else:
-        return redirect('https://pbot2.azurewebsites.net/failure')
+        response = 'Failure'
+        return jsonify(response)
 
 
 @app.route('/api/v1.0/create', methods = ['POST', 'GET'])
@@ -75,14 +77,15 @@ def create():
     user = userdata.get('email')
     password = userdata.get('password')
     if (authentication.createUser(user, password)) == 1:
-        response = redirect('https://pbot2.azurewebsites.net/login')
-        return response 
+        response = 'Success'
+        return jsonify(response)
     else:
-        return redirect('https://pbot2.azurewebsites.net/failure')
+        response = 'Failure'
+        return jsonify(response)
 
 
 rawTab = threading.Thread(target= api_tabulated_new.rawtab, name = 'Table')
 rawTab.start()
 if __name__ == '__main__':
     app.config['TESTING'] = True
-    app.run(host='0.0.0.0', port='8000', debug = True)
+    app.run(host='0.0.0.0', port='5678', debug = True)
