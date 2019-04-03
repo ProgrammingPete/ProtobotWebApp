@@ -18,12 +18,11 @@ import api_tabulated_new
 import _thread
 import threading
 from flask_sqlalchemy import SQLAlchemy
-from flask_cors import CORS
 
 
 import os
 app = Flask(__name__)
-cors = CORS(app, supports_credentials=True)
+
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 #configuration
@@ -64,11 +63,9 @@ def login():
       password = userdata.get('password')
       if (authentication.validation(user, password)) == 1:
         response = redirect('https://pbot.azurewebsites.net/data')
-        response.headers.add('Access-Control-Allow-Origin', '*')
         return response
       else:
         response = redirect('https://pbot.azurewebsites.net/loginFailure')
-        response.headers.add('Access-Control-Allow-Origin', '*')
         return response
 
 
