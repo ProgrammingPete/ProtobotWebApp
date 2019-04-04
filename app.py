@@ -1,5 +1,5 @@
 """
-This is the script that will hold the View, Models ,and the Routes for the application.
+This is the script that will hold the Models and Routes for the application.
 This will be changed in the future, if the code becomes to messy.
 
 How to use the database: 
@@ -93,5 +93,4 @@ def create():
 rawTab = threading.Thread(target= api_tabulated_new.rawtab, name = 'Table')
 rawTab.start()
 if __name__ == '__main__':
-    app.config['TESTING'] = True
-    app.run(host='0.0.0.0', port='5678', debug = True)
+    app.run(host='0.0.0.0', port='5678')

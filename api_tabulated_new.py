@@ -6,13 +6,16 @@ import pandas as pd
 import threading
 import os
 
+#lock = threading.Lock()
 
 def rawtab():
+    global rawtable
     """Method that is run within a thread. Maintains a data structure in memory."""
     indicator = False
     count = 0
     interval_seconds = 60
     trading_pairs = ['BTCUSDT']
+    update_csv()
     while True:
         count = count + 1
         #check status of binance server
@@ -21,14 +24,23 @@ def rawtab():
 
         for pair in trading_pairs:
             klines = client.get_klines(symbol=pair, interval='1m', limit=1)
-            entry = convert_format(klines,pair)
-            rawtable.append(entry)
+            for kline in klines:
+                entry = convert_format(kline,pair)
+            
+ #       with lock:
+ #           if rawtable:
+ #               if entry ==  rawtable[-1]:
+ #                   print('already entered')
+ #           rawtable.append(entry)
+ #           print(rawtable, threading.get_ident())
+    
+        rawtable.append(entry)
+        print(rawtable, threading.get_ident())
 
         if len(rawtable) > 20:
             entry = rawtable.pop(0)
             if count == 20: 
                 count = count / 20
-                print('Updating CSV file')
                 update_csv()
                     
             tenSMA, twentySMA = calcMovAvg(rawtable)
@@ -49,9 +61,8 @@ def rawtab():
 
 def write_to_csv(entry):
         tab = pd.DataFrame(entry)
-        file = open('rawtab.csv', 'a')
-        tab.to_csv(file , mode= 'a', header= False )
-        file.close()
+        with  open('rawtab.csv', 'a') as file:
+            tab.to_csv(file , mode= 'a', header= False )
 
 def calcMovAvg(rawtable):
         averageMov_ten, averageMov_twenty, total = int(), int(), int()
@@ -101,7 +112,8 @@ def get_historical(start_time, end_time, kline_length='1m', currency = "BTCUSDT"
 
 def convert_format(kline, pair):
     entry = dict()
-    entry['trading_pair'] = pair   
+    entry['trading_pair'] = pair  
+    #print(kline[0],type(kline[0]))
     kline[0] = datetime.utcfromtimestamp((kline[0])/1000).strftime('%Y/%m/%d %H:%M:%S')
     kline[6] = datetime.utcfromtimestamp((kline[6])/1000).strftime('%Y/%m/%d %H:%M:%S')
     for i, label in enumerate(labels):
@@ -146,18 +158,24 @@ def reverse_readline(filename, buf_size=8192):
             yield segment
 
 def update_csv():
-    """Update the saved bitcoin Klines"""
-    last_line = next(reverse_readline('rawtab1.csv')).split(',') # use the reverse generator
-    time = date_to_milliseconds(last_line[7]) + 60000  #get last missed kline open time
-    klines_diff = client.get_historical_klines('BTCUSDT','1m', time) # fetch difference from api
-    for kline in klines_diff: # write new klines to file
-        api.write_to_csv([api.convert_format(kline, 'BTCUSDT')])
+    """Update the save bitcoin Klines"""
+    with update_lock:
+        print("Updating CSV")
+        last_line = next(reverse_readline('rawtab.csv')).split(',') # use the reverse generator
+        time = date_to_milliseconds(last_line[7]) + 60000  #get last missed kline open time
+        klines_diff = client.get_historical_klines('BTCUSDT','1m', time) # fetch difference from api
+        #print(klines_diff)
+        for kline in klines_diff: # write new klines to file
+            print(kline)
+            kline = convert_format(kline, 'BTCUSDT')
+            write_to_csv([kline])
     
 api_key = 'cPm5GZKAa60eT8cvkMbrhkvQN9ZkYPCDDS9sJ9VHgceOdXPHYsJcEqsmCaSIFJjr'#generated from binance
 api_secret = 'SBv8xWd1hu0djnFYZjE9lJJNROohaeyDyyAJdGp7htK64uPcALWJTS4L2swjFUac'#generated from binance
 client = Client(api_key,api_secret)
 
 rawtable = list()  # shared resource
+update_lock = threading.Lock() # shared resource
 
 labels = ['Open_Time','Open_Price','High', 'Low', 'Close_Price',
           'Volume', 'Close_time', 'Quote_asset_volume','Number_Of_Trades',
