@@ -1,6 +1,6 @@
 """
-This is the script that will hold teh View, Models ,a nd the routes for the application.
-THis will be changed in the future, if the code becomes to messy.
+This is the script that will hold the View, Models ,and the Routes for the application.
+This will be changed in the future, if the code becomes to messy.
 
 How to use the database: 
 If you change the schema, you will need to update the db file in a python shell:
@@ -55,6 +55,15 @@ def get_tasks():
 def success(name):
    return 'welcome %s' % name
 
+# route example: /api/v1.0/historical?end=<STRING HERE>?start=<STRING HERE>
+@app.route('/api/v1.0/historical')
+def historical():
+    end = request.args.get('end', type = str)
+    start = request.args.get('start', default = 'now', type = str)
+    interval = request.args.get('interval', default = '1m', type = str)
+    trading_pair = request.args.get('pair', default = 'BTCUSDT', type = str)
+    data = api_tabulated_new.get_historical(end, start, interval, trading_pair)
+    return jsonify({'historical' : data }) 
 
 @app.route('/api/v1.0/login', methods = ['POST', 'GET'])
 def login():
@@ -85,4 +94,4 @@ rawTab = threading.Thread(target= api_tabulated_new.rawtab, name = 'Table')
 rawTab.start()
 if __name__ == '__main__':
     app.config['TESTING'] = True
-    app.run(host='0.0.0.0', port='8000', debug = True)
+    app.run(host='0.0.0.0', port='5678', debug = True)
