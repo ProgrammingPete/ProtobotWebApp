@@ -18,12 +18,11 @@ import api_tabulated_new
 import _thread
 import threading
 from flask_sqlalchemy import SQLAlchemy
-from flask_cors import CORS
 
 
 import os
 app = Flask(__name__)
-cors = CORS(app, supports_credentials=True)
+
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 #configuration
@@ -72,9 +71,11 @@ def login():
       user = userdata.get('email')
       password = userdata.get('password')
       if (authentication.validation(user, password)) == 1:
-        return redirect('https://pbot2.azurewebsites.net/data') 
+        response = redirect('https://pbot.azurewebsites.net/data')
+        return response
       else:
-        return redirect('https://pbot2.azurewebsites.net/failure')
+        response = redirect('https://pbot.azurewebsites.net/loginFailure')
+        return response
 
 
 @app.route('/api/v1.0/create', methods = ['POST', 'GET'])
@@ -84,10 +85,11 @@ def create():
     user = userdata.get('email')
     password = userdata.get('password')
     if (authentication.createUser(user, password)) == 1:
-        response = redirect('https://pbot2.azurewebsites.net/login')
-        return response 
+        response = 'Success'
+        return jsonify(response)
     else:
-        return redirect('https://pbot2.azurewebsites.net/failure')
+        response = 'Failure'
+        return jsonify(response)
 
 
 rawTab = threading.Thread(target= api_tabulated_new.rawtab, name = 'Table')
