@@ -71,10 +71,10 @@ def login():
       user = userdata.get('email')
       password = userdata.get('password')
       if (authentication.validation(user, password)) == 1:
-        response = redirect('https://pbot.azurewebsites.net/data')
+        response = jsonify(redirect('https://pbot.azurewebsites.net'))
         return response
       else:
-        response = redirect('https://pbot.azurewebsites.net/loginFailure')
+        response = jsonify(redirect('https://pbot.azurewebsites.net'))
         return response
 
 
@@ -85,10 +85,10 @@ def create():
     user = userdata.get('email')
     password = userdata.get('password')
     if (authentication.createUser(user, password)) == 1:
-        response = 'Success'
+        response = 'success'
         return jsonify(response)
     else:
-        response = 'Failure'
+        response = 'failure'
         return jsonify(response)
 
 
