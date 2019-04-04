@@ -71,7 +71,7 @@ def login():
       user = userdata.get('email')
       password = userdata.get('password')
       if (authentication.validation(user, password)) == 1:
-        response = redirect('https://pbot.azurewebsites.net', code=301)
+        response = redirect(url_for('https://pbot.azurewebsites.net/data', _external=true))
         return response
       else:
         response = redirect('https://pbot.azurewebsites.net/failure', code=301)
