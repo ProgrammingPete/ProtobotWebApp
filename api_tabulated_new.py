@@ -14,7 +14,7 @@ def rawtab(filename = 'rawtab_BTCUSDT.csv', pair = 'BTCUSDT'):
     """
     indicator = False
     count = 0
-    interval_seconds = 60 
+    interval_seconds = 1 
     #with lock:
     update_csv(filename, pair)
     while True:
@@ -34,12 +34,13 @@ def rawtab(filename = 'rawtab_BTCUSDT.csv', pair = 'BTCUSDT'):
         print(supported_pairs[pair], threading.current_thread().name)
 
         if len(supported_pairs[pair]) > 20:
-            entry = rawtable.pop(0) # keep table at 20 entries (might remove this)
+            entry = supported_pairs[pair].pop(0) # keep table at 20 entries (might remove this)
             if count == 20: # save new klines to file
                 count = count / 20
-                update_csv(filename, pair)
+                #update_csv(filename, pair)
+                print('Write here')
                     
-            tenSMA, twentySMA = calcMovAvg(rawtable) # do some data calc sheit
+            tenSMA, twentySMA = calcMovAvg(supported_pairs[pair]) # do some data calc sheit
             if tenSMA > twentySMA:
                 indicator = True# buy
             else:
@@ -155,7 +156,7 @@ def reverse_readline(filename, buf_size=8192):
             yield segment
 
 def update_csv(filename, pair = 'BTCUSDT', interval = '1m'):
-    """Update the save bitcoin Klines"""
+    """Update the save Klines"""
     print("Updating CSV")
     last_line = next(reverse_readline(filename)).split(',') # use the reverse generator
     time = date_to_milliseconds(last_line[7]) + interval_to_milliseconds(interval)  #get last missed kline open time
