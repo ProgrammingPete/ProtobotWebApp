@@ -103,7 +103,8 @@ def get_historical(start_time, end_time, kline_length='1m', currency = "BTCUSDT"
     outputTab = list()
     if check_status():
         return {'error' : 'Binance_server_maintenance'} 
-    klines = client.get_historical_klines(symbol=currency, interval=kline_length,start_str= start_time, end_str=end_time )
+    with lock:
+        klines = client.get_historical_klines(symbol=currency, interval=kline_length,start_str= start_time, end_str=end_time )
     for kline in klines:
         outputTab.append(convert_format(kline, currency))
     return outputTab 
@@ -177,7 +178,7 @@ rawtab_ETHUSDT = list()
 #rawtab_ETCUSDT = list()
 supported_pairs = {'BTCUSDT' : rawtab_BTCUSDT,
                    'ETHUSDT' : rawtab_ETHUSDT}
-#lock = threading.Lock()  
+lock = threading.Lock()  
 labels = ['Open_Time','Open_Price','High', 'Low', 'Close_Price',
           'Volume', 'Close_time', 'Quote_asset_volume','Number_Of_Trades',
           'Taker_buy_base', 'Taker_buy_quote' ]
