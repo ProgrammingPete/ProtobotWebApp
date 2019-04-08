@@ -49,8 +49,6 @@ wsgi_app = app.wsgi_app
 @app.route('/api/v1.0/update', methods=['GET'])
 def get_tasks():
     pair = request.args.get('pair', type = str, default = 'BTCUSDT')
-    for t in threading.enumerate():
-        print(t)
     if pair in api.supported_pairs:
         return jsonify({'Trading_Info': api.supported_pairs[pair]})
     else:
@@ -102,8 +100,8 @@ def create():
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port='5678')
 else:
-    #needed to place threads here to avoid duplicate threads for some crap reason 
-    rawTab = threading.Thread(target= api.rawtab, name = 'Bitcoin Thread', kwargs = {'filename': 'rawtab_btcusdt.csv','pair' : 'BTCUSDT'})
-    rawTab2 = threading.Thread(target= api.rawtab, name = 'Ethereum Thread', kwargs = {'filename': 'rawtab_ethusdt.csv', 'pair' : 'ETHUSDT'})
-    rawTab.start()
-    rawTab2.start()
+    #needed to place threads here to avoid duplicate threads for some crap reason
+    for t in api.supported_pairs.keys():
+        tab = threading.Thread(target= api.rawtab, name = str(t) + ' Thread', kwargs = {'filename': 'rawtab_' + str(t) + '.csv','pair' : t})
+        tab.start()
+    

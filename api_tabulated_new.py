@@ -7,7 +7,7 @@ import threading
 import os
 
 
-def rawtab(filename = 'rawtab_btcusdt.csv', pair = 'BTCUSDT'):
+def rawtab(filename = 'rawtab_BTCUSDT.csv', pair = 'BTCUSDT'):
     """
     Method that is run within a thread.
     Maintains a data structure (list of dictionaries) in plain old memory.
@@ -172,8 +172,10 @@ api_secret = 'SBv8xWd1hu0djnFYZjE9lJJNROohaeyDyyAJdGp7htK64uPcALWJTS4L2swjFUac'#
 client = Client(api_key,api_secret)
 
 rawtab_BTCUSDT = list()
-rawtab_ETHUSDT = list() 
-supported_pairs = {'BTCUSDT' : rawtab_BTCUSDT, 'ETHUSDT' : rawtab_ETHUSDT }
+rawtab_ETHUSDT = list()
+#rawtab_ETCUSDT = list()
+supported_pairs = {'BTCUSDT' : rawtab_BTCUSDT,
+                   'ETHUSDT' : rawtab_ETHUSDT}
 #lock = threading.Lock()  
 labels = ['Open_Time','Open_Price','High', 'Low', 'Close_Price',
           'Volume', 'Close_time', 'Quote_asset_volume','Number_Of_Trades',
