@@ -14,7 +14,7 @@ def rawtab(filename = 'rawtab_BTCUSDT.csv', pair = 'BTCUSDT'):
     """
     indicator = False
     count = 0
-    interval_seconds = 1 
+    interval_seconds = 60 
     #with lock:
     update_csv(filename, pair)
     while True:
@@ -37,8 +37,8 @@ def rawtab(filename = 'rawtab_BTCUSDT.csv', pair = 'BTCUSDT'):
             entry = supported_pairs[pair].pop(0) # keep table at 20 entries (might remove this)
             if count == 20: # save new klines to file
                 count = count / 20
-                #update_csv(filename, pair)
-                print('Write here')
+                update_csv(filename, pair)
+                #print('Write here')
                     
             tenSMA, twentySMA = calcMovAvg(supported_pairs[pair]) # do some data calc sheit
             if tenSMA > twentySMA:
