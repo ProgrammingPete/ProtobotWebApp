@@ -4,6 +4,9 @@
 #ignore all csv file since they are massive
 *.csv
 
+#this is for vim
+*.*.swp
+
 # User-specific files
 *.suo
 *.user
