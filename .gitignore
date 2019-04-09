@@ -7,6 +7,8 @@
 #this is for vim
 *.*.swp
 
+ProtobotWebApp/venv
+
 # User-specific files
 *.suo
 *.user
