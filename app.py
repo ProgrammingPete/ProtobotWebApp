@@ -14,13 +14,13 @@ If you change the schema, you will need to update the db file in a python shell:
 """
 
 from flask import Flask, jsonify, redirect, url_for, request, render_template
-import api_tabulated_new
+import api_tabulated_new as api
 import _thread
 import threading
 from flask_sqlalchemy import SQLAlchemy
 
-
 import os
+
 app = Flask(__name__)
 
 
@@ -44,10 +44,15 @@ import authentication
 # Make the WSGI interface available at the top level so wfastcgi can get it.
 wsgi_app = app.wsgi_app
 
-
+## route example: /api/v1.0/update?pair=<STRING HERE>
+## for now, can only be BTCUSDT or ETHUSDT
 @app.route('/api/v1.0/update', methods=['GET'])
 def get_tasks():
-    return jsonify({'Trading_Info': api_tabulated_new.rawtable})
+    pair = request.args.get('pair', type = str, default = 'BTCUSDT')
+    if pair in api.supported_pairs:
+        return jsonify({'Trading_Info': api.supported_pairs[pair]})
+    else:
+        return jsonify({'Error' : 'unsupported'})
 
 
 @app.route('/api/v1.0/success/<name>')
@@ -61,7 +66,7 @@ def historical():
     start = request.args.get('start', default = 'now', type = str)
     interval = request.args.get('interval', default = '1m', type = str)
     trading_pair = request.args.get('pair', default = 'BTCUSDT', type = str)
-    data = api_tabulated_new.get_historical(end, start, interval, trading_pair)
+    data = api.get_historical(end, start, interval, trading_pair)
     return jsonify({'historical' : data }) 
 
 @app.route('/api/v1.0/login', methods = ['POST', 'GET'])
@@ -92,7 +97,11 @@ def create():
         return jsonify(response)
 
 
-rawTab = threading.Thread(target= api_tabulated_new.rawtab, name = 'Table')
-rawTab.start()
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port='5678')
+else:
+    #needed to place threads here to avoid duplicate threads for some crap reason
+    for t in api.supported_pairs.keys():
+        tab = threading.Thread(target= api.rawtab, name = str(t) + ' Thread', kwargs = {'filename': 'rawtab_' + str(t) + '.csv','pair' : t})
+        tab.start()
+    

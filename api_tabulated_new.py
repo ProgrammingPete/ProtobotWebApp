@@ -1,5 +1,5 @@
 from binance.client import Client
-from binance.helpers import date_to_milliseconds
+from binance.helpers import date_to_milliseconds, interval_to_milliseconds
 import time
 from datetime import datetime
 import pandas as pd
@@ -7,60 +7,59 @@ import threading
 import os
 
 
-def rawtab():
-    """Method that is run within a thread. Maintains a data structure in memory."""
+def rawtab(filename = 'rawtab_BTCUSDT.csv', pair = 'BTCUSDT'):
+    """
+    Method that is run within a thread.
+    Maintains a data structure (list of dictionaries) in plain old memory.
+    """
     indicator = False
     count = 0
-    interval_seconds = 60
-    trading_pairs = ['BTCUSDT']
-    with lock:
-        update_csv()
-        while True:
-            count = count + 1
-            #check status of binance server
-            if check_status():
-                rawtab.append({'error' : 'binance_server_maintenance'})
+    interval_seconds = 60 
+    #with lock:
+    update_csv(filename, pair)
+    while True:
+        count = count + 1
+        #check status of binance server
+        if check_status():
+            supported_pairs[pair].append({'Error' : 'binance_server_maintenance'})
+            break
 
-            for pair in trading_pairs:
-                klines = client.get_klines(symbol=pair, interval='1m', limit=1)
-                for kline in klines:
-                    entry = convert_format(kline,pair)
-                
-     #       with lock:
-     #           if rawtable:
-     #               if entry ==  rawtable[-1]:
-     #                   print('already entered')
-     #           rawtable.append(entry)
-     #           print(rawtable, threading.get_ident())
+        #fetch kline from binance and convert format to ours
+        klines = client.get_klines(symbol=pair, interval='1m', limit=1)
+        for kline in klines:
+            entry = convert_format(kline,pair)
         
-            rawtable.append(entry)
-            print(rawtable, threading.get_ident())
+        # add entry to rawtab
+        supported_pairs[pair].append(entry)
+        print(supported_pairs[pair], threading.current_thread().name)
 
-            if len(rawtable) > 20:
-                entry = rawtable.pop(0)
-                if count == 20: 
-                    count = count / 20
-                    update_csv()
-                        
-                tenSMA, twentySMA = calcMovAvg(rawtable)
-                if tenSMA > twentySMA:
-                    indicator = True# buy
-                else:
-                    indicator = False# sell
-                rawtable[-1]['indicator']  = str(indicator)
-                rawtable[-1]['10-SMA']  = str(tenSMA)
-                rawtable[-1]['20-SMA']  = str(twentySMA)
+        if len(supported_pairs[pair]) > 20:
+            entry = supported_pairs[pair].pop(0) # keep table at 20 entries (might remove this)
+            if count == 20: # save new klines to file
+                count = count / 20
+                update_csv(filename, pair)
+                #print('Write here')
+                    
+            tenSMA, twentySMA = calcMovAvg(supported_pairs[pair]) # do some data calc sheit
+            if tenSMA > twentySMA:
+                indicator = True# buy
             else:
-                rawtable[- 1]['indicator']  = str(indicator)
-                rawtable[- 1]['10-SMA']  = 0
-                rawtable[- 1]['20-SMA']  = 0
+                indicator = False# sell
+            # this looks horrendous lol, but we add it to the current entry
+            supported_pairs[pair][-1]['indicator']  = str(indicator)
+            supported_pairs[pair][-1]['10-SMA']  = str(tenSMA)
+            supported_pairs[pair][-1]['20-SMA']  = str(twentySMA)
+        else:
+            supported_pairs[pair][- 1]['indicator']  = str(indicator)
+            supported_pairs[pair][- 1]['10-SMA']  = 0
+            supported_pairs[pair][- 1]['20-SMA']  = 0
 
-            time.sleep(interval_seconds)
+        time.sleep(interval_seconds)
 
 
-def write_to_csv(entry):
+def write_to_csv(entry,filename):
         tab = pd.DataFrame(entry)
-        with  open('rawtab.csv', 'a') as file:
+        with  open(filename, 'a') as file:
             tab.to_csv(file , mode= 'a', header= False )
 
 def calcMovAvg(rawtable):
@@ -104,9 +103,10 @@ def get_historical(start_time, end_time, kline_length='1m', currency = "BTCUSDT"
     outputTab = list()
     if check_status():
         return {'error' : 'Binance_server_maintenance'} 
-    klines = client.get_historical_klines(symbol=currency, interval=kline_length,start_str= start_time, end_str=end_time )
+    with lock:
+        klines = client.get_historical_klines(symbol=currency, interval=kline_length,start_str= start_time, end_str=end_time )
     for kline in klines:
-        outputTab.append(convert_format(kline))
+        outputTab.append(convert_format(kline, currency))
     return outputTab 
 
 def convert_format(kline, pair):
@@ -156,24 +156,28 @@ def reverse_readline(filename, buf_size=8192):
         if segment is not None:
             yield segment
 
-def update_csv():
-    """Update the save bitcoin Klines"""
+def update_csv(filename, pair = 'BTCUSDT', interval = '1m'):
+    """Update the save Klines"""
     print("Updating CSV")
-    last_line = next(reverse_readline('rawtab.csv')).split(',') # use the reverse generator
-    time = date_to_milliseconds(last_line[7]) + 60000  #get last missed kline open time
-    klines_diff = client.get_historical_klines('BTCUSDT','1m', time) # fetch difference from api
+    last_line = next(reverse_readline(filename)).split(',') # use the reverse generator
+    time = date_to_milliseconds(last_line[7]) + interval_to_milliseconds(interval)  #get last missed kline open time
+    klines_diff = client.get_historical_klines(pair,'1m', time) # fetch difference from api
     #print(klines_diff)
     for kline in klines_diff: # write new klines to file
         print(kline)
-        kline = convert_format(kline, 'BTCUSDT')
-        write_to_csv([kline])
-    
+        kline = convert_format(kline, pair)
+        write_to_csv([kline], filename)
+
+### shared resources #######
 api_key = 'cPm5GZKAa60eT8cvkMbrhkvQN9ZkYPCDDS9sJ9VHgceOdXPHYsJcEqsmCaSIFJjr'#generated from binance
 api_secret = 'SBv8xWd1hu0djnFYZjE9lJJNROohaeyDyyAJdGp7htK64uPcALWJTS4L2swjFUac'#generated from binance
 client = Client(api_key,api_secret)
 
-### shared resources
-rawtable = list() 
+rawtab_BTCUSDT = list()
+rawtab_ETHUSDT = list()
+#rawtab_ETCUSDT = list()
+supported_pairs = {'BTCUSDT' : rawtab_BTCUSDT,
+                   'ETHUSDT' : rawtab_ETHUSDT}
 lock = threading.Lock()  
 labels = ['Open_Time','Open_Price','High', 'Low', 'Close_Price',
           'Volume', 'Close_time', 'Quote_asset_volume','Number_Of_Trades',
