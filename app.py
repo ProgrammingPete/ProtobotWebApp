@@ -73,16 +73,16 @@ def historical():
 
 @app.route('/api/v1.0/login', methods = ['POST', 'GET'])
 def login():
-   if request.method == 'POST':
+   if request.method == 'GET':
       userdata = request.get_json()
       user = userdata.get('email')
       password = userdata.get('password')
       if (authentication.validation(user, password)) == 1:
-        response = redirect('https://pbot.azurewebsites.net', code=301)
-        return response
+        response = 'success'
+        return jsonify(response)
       else:
-        response = redirect('https://pbot.azurewebsites.net/failure', code=301)
-        return response
+        response = 'failure'
+        return jsonify(response)
 
 
 @app.route('/api/v1.0/create', methods = ['POST', 'GET'])
