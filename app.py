@@ -71,7 +71,7 @@ def historical():
 
 @app.route('/api/v1.0/login', methods = ['POST', 'GET'])
 def login():
-   if request.method == 'GET':
+   if request.method == 'POST':
       userdata = request.get_json()
       user = userdata.get('email')
       password = userdata.get('password')
