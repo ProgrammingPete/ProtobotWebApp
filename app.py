@@ -62,13 +62,11 @@ def success(name):
 # route example: /api/v1.0/historical?end=<STRING HERE>?start=<STRING HERE>
 @app.route('/api/v1.0/historical')
 def historical():
-    print('start thread', threading.get_ident())
     end = request.args.get('end', type = str)
     start = request.args.get('start', default = 'now', type = str)
     interval = request.args.get('interval', default = '1m', type = str)
     trading_pair = request.args.get('pair', default = 'BTCUSDT', type = str)
     data = api.get_historical(end, start, interval, trading_pair)
-    print('finish', threading.get_ident())
     return jsonify({'historical' : data }) 
 
 @app.route('/api/v1.0/login', methods = ['POST', 'GET'])
