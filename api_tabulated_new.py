@@ -14,7 +14,7 @@ def rawtab(filename = 'rawtab_BTCUSDT.csv', pair = 'BTCUSDT'):
     """
     indicator = False
     count = 0
-    interval_seconds = 60 
+    interval_seconds = 60
     #with lock:
     update_csv(filename, pair)
     while True:
@@ -31,24 +31,32 @@ def rawtab(filename = 'rawtab_BTCUSDT.csv', pair = 'BTCUSDT'):
         
         # add entry to rawtab
         supported_pairs[pair].append(entry)
-        print(supported_pairs[pair], threading.current_thread().name)
-
+        #print('csv', threading.current_thread().name)
+        
         if len(supported_pairs[pair]) > 20:
             entry = supported_pairs[pair].pop(0) # keep table at 20 entries (might remove this)
-            if count == 20: # save new klines to file
-                count = count / 20
+            if count >= 20: # save new klines to file
+                count = 0
                 update_csv(filename, pair)
-                #print('Write here')
                     
             tenSMA, twentySMA = calcMovAvg(supported_pairs[pair]) # do some data calc sheit
             if tenSMA > twentySMA:
                 indicator = True# buy
             else:
                 indicator = False# sell
+            newdict = {
+                    'Open_Time' :  supported_pairs[pair][-1]['Open_Time'],
+                    'Close_time' :  supported_pairs[pair][-1]['Close_time'],
+                    'indicator' : indicator,
+                    '10-SMA' : tenSMA,
+                    '20-SMA' : twentySMA}
+
+            write_to_csv([newdict],filename.split('.')[0] + '_indicator.csv');
             # this looks horrendous lol, but we add it to the current entry
             supported_pairs[pair][-1]['indicator']  = str(indicator)
             supported_pairs[pair][-1]['10-SMA']  = str(tenSMA)
             supported_pairs[pair][-1]['20-SMA']  = str(twentySMA)
+        
         else:
             supported_pairs[pair][- 1]['indicator']  = str(indicator)
             supported_pairs[pair][- 1]['10-SMA']  = 0
@@ -103,8 +111,8 @@ def get_historical(start_time, end_time, kline_length='1m', currency = "BTCUSDT"
     outputTab = list()
     if check_status():
         return {'error' : 'Binance_server_maintenance'} 
-    with lock:
-        klines = client.get_historical_klines(symbol=currency, interval=kline_length,start_str= start_time, end_str=end_time )
+#    with lock:
+    klines = client.get_historical_klines(symbol=currency, interval=kline_length,start_str= start_time, end_str=end_time )
     for kline in klines:
         outputTab.append(convert_format(kline, currency))
     return outputTab 

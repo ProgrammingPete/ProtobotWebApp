@@ -6,3 +6,4 @@ pandas
 flask_cors
 locustio
 gunicorn
+pylibmc

@@ -18,7 +18,7 @@ import api_tabulated_new as api
 import _thread
 import threading
 from flask_sqlalchemy import SQLAlchemy
-
+from werkzeug.contrib.cache import MemcachedCache
 import os
 
 app = Flask(__name__)
@@ -29,6 +29,8 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'app.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False #signals the app every time a change is made to db
 db = SQLAlchemy(app)
+
+cache = MemcachedCache(['127.0.0.1:11211'])
 
 class User(db.Model):
     """Class representation of a Client"""
@@ -59,21 +61,44 @@ def get_tasks():
 def success(name):
    return 'welcome %s' % name
 
-# route example: /api/v1.0/historical?end=<STRING HERE>?start=<STRING HERE>
+# route example: /api/v1.0/historical?start=<STRING HERE>?end=<STRING HERE>
+#params can be in any order, but you have to include start param
+#try to define the strings as dates: 2019/04/10 14:40:59
 @app.route('/api/v1.0/historical')
 def historical():
-    end = request.args.get('end', type = str)
-    start = request.args.get('start', default = 'now', type = str)
+    start = request.args.get('start', type = str)
+    end = request.args.get('end', type = str, default = 'now')
     interval = request.args.get('interval', default = '1m', type = str)
     trading_pair = request.args.get('pair', default = 'BTCUSDT', type = str)
-    data = api.get_historical(end, start, interval, trading_pair)
-    return jsonify({'historical' : data }) 
+    # igotta make sure that end is ALWAYS after start
+    if start:
+        print(end, start)
+        e = end.replace(' ', '')
+        s = start.replace(' ', '')
+        if end == 'now':
+            data = cache.get('historical:' + s)
+        else:
+            data = cache.get('historical:' + s + ',' + e)
+        print(e, s)
+        if data is None:
+            print('no cache')
+            data = api.get_historical(end, start, interval, trading_pair)
+            print(data)
+            if end == 'now':
+                cache.set('historical:' + s, data, timeout=60)
+            else:
+                cache.set('historical:' + s + ',' +  e, data, timeout=360)
+        else:
+            print('using cache')
+        return jsonify({'historical' : data })
+    else:
+        return jsonify('error: need to specify start param')
 
 @app.route('/api/v1.0/login', methods = ['POST', 'GET'])
 def login():
    if request.method == 'GET':
       userdata = request.get_json()
-      user = userdata.get('email')
+      user = userdata.get('email').strip()['Close_Time']
       password = userdata.get('password')
       if (authentication.validation(user, password)) == 1:
         response = 'success'
