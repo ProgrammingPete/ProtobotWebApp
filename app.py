@@ -82,7 +82,7 @@ def historical():
         print(e, s)
         if data is None:
             print('no cache')
-            data = api.get_historical(end, start, interval, trading_pair)
+            data = api.get_historical(start, end,  interval, trading_pair)
             print(data)
             if end == 'now':
                 cache.set('historical:' + s, data, timeout=60)
@@ -98,7 +98,7 @@ def historical():
 def login():
    if request.method == 'POST':
       userdata = request.get_json()
-      user = userdata.get('email').strip()['Close_Time']
+      user = userdata.get('email')
       password = userdata.get('password')
       if (authentication.validation(user, password)) == 1:
         response = 'success'
