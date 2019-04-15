@@ -17,6 +17,10 @@ def rawtab(filename = 'rawtab_BTCUSDT.csv', pair = 'BTCUSDT'):
     interval_seconds = 60
     #with lock:
     update_csv(filename, pair)
+#   date_now = date_to_milliseconds('now')/1000 + 4*3600
+#   date = datetime.utcfromtimestamp(date_now - 1140).strftime('%Y/%m/%d %H:%M:00')
+#   supported_pairs[pair] = get_from_csv(pair, date, 'now')
+    
     while True:
         count = count + 1
         #check status of binance server
@@ -26,7 +30,7 @@ def rawtab(filename = 'rawtab_BTCUSDT.csv', pair = 'BTCUSDT'):
 
         #fetch kline from binance and convert format to ours
         klines = client.get_klines(symbol=pair, interval='1m', limit=1)
-        for kline in klines:
+        for kline in klines: # list of list only has one list
             entry = convert_format(kline,pair)
         
         # add entry to rawtab
@@ -35,23 +39,25 @@ def rawtab(filename = 'rawtab_BTCUSDT.csv', pair = 'BTCUSDT'):
         
         if len(supported_pairs[pair]) > 20:
             entry = supported_pairs[pair].pop(0) # keep table at 20 entries (might remove this)
-            if count >= 20: # save new klines to file
+            if count >= 20: # save new klines to file every count seconds
                 count = 0
                 update_csv(filename, pair)
-                    
+            
             tenSMA, twentySMA = calcMovAvg(supported_pairs[pair]) # do some data calc sheit
             if tenSMA > twentySMA:
                 indicator = True# buy
             else:
                 indicator = False# sell
+            #creates a new csv file with just these values
             newdict = {
                     'Open_Time' :  supported_pairs[pair][-1]['Open_Time'],
                     'Close_time' :  supported_pairs[pair][-1]['Close_time'],
+                    'Open_Price' : supported_pairs[pair][-1]['Open_Price'],
                     'indicator' : indicator,
                     '10-SMA' : tenSMA,
                     '20-SMA' : twentySMA}
 
-            write_to_csv([newdict],filename.split('.')[0] + '_indicator.csv');
+            write_to_csv([newdict],filename.split('.')[0] + '_indicator2.csv');
             # this looks horrendous lol, but we add it to the current entry
             supported_pairs[pair][-1]['indicator']  = str(indicator)
             supported_pairs[pair][-1]['10-SMA']  = str(tenSMA)
@@ -66,6 +72,7 @@ def rawtab(filename = 'rawtab_BTCUSDT.csv', pair = 'BTCUSDT'):
 
 
 def write_to_csv(entry,filename):
+        '''Rearranges columns in alphabetical order'''
         tab = pd.DataFrame(entry)
         with  open(filename, 'a') as file:
             tab.to_csv(file , mode= 'a', header= False )
@@ -108,23 +115,52 @@ def get_historical(start_time, end_time, kline_length='1m', currency = "BTCUSDT"
                 ]
             ]
     """
-    outputTab = list()
+    #outputTab = list()
     if check_status():
         return {'error' : 'Binance_server_maintenance'} 
-#    with lock:
-    klines = client.get_historical_klines(symbol=currency, interval=kline_length,start_str= start_time, end_str=end_time )
-    for kline in klines:
-        outputTab.append(convert_format(kline, currency))
-    return outputTab 
+    #klines = client.get_historical_klines(symbol=currency, interval=kline_length,start_str= start_time, end_str=end_time )
+    #for kline in klines:
+    #    outputTab.append(convert_format(kline, currency))
+    
+    return  get_from_csv(currency, start_time, end_time) 
+
+def get_from_csv(pair, start, end):
+    pair = pair.upper()
+    filename = 'rawtab_' + pair + '.csv'
+    reverse_readline1 = reverse_readline(filename)
+    table = list()
+    found_end = False
+    for kline in reverse_readline1:
+        kline = kline.split(',')
+        #print(kline)
+#        print(start, kline[7])
+        if kline[7] == end or found_end == True or end == 'now':
+            found_end = True
+            if kline[7] == start:
+                kline_conv = convert_format(kline, pair)
+                table.insert(0, kline_conv)
+                break
+            else:
+                kline_conv = convert_format(kline, pair)
+                #add to beginning of list by using .insert(0, kline_converted) function
+                table.insert(0, kline_conv)
+    return table
 
 def convert_format(kline, pair):
     entry = dict()
     entry['trading_pair'] = pair  
     #print(kline[0],type(kline[0]))
-    kline[0] = datetime.utcfromtimestamp((kline[0])/1000).strftime('%Y/%m/%d %H:%M:%S')
-    kline[6] = datetime.utcfromtimestamp((kline[6])/1000).strftime('%Y/%m/%d %H:%M:%S')
-    for i, label in enumerate(labels):
-        entry[label] = kline[i]
+    if kline[0] == '0':
+        # convert from our csv format to our format (list of dicts)
+        # ,Close_Price,Close_time,High,Low,Number_Of_Trades,Open_Price,Open_Time,Quote_asset_volume,Taker_buy_base,Taker_buy_quote,Volume,trading_pair
+        for i, label in enumerate(sorted(labels)):
+            entry[label] = kline[i+1]
+    else:
+        #converts from binance kline format(from api) to our format (list of dictionaries)
+        kline[0] = datetime.utcfromtimestamp((kline[0])/1000).strftime('%Y/%m/%d %H:%M:%S')
+        kline[6] = datetime.utcfromtimestamp((kline[6])/1000).strftime('%Y/%m/%d %H:%M:%S')
+        for i, label in enumerate(labels):
+            entry[label] = str(kline[i])
     return entry
 
 def check_status():

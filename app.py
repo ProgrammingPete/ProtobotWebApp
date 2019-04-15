@@ -63,7 +63,7 @@ def success(name):
 
 # route example: /api/v1.0/historical?start=<STRING HERE>?end=<STRING HERE>
 #params can be in any order, but you have to include start param
-#try to define the strings as dates: 2019/04/10 14:40:59
+#try to define the strings as dates (Open_Time): 2019/04/10 14:40:00
 @app.route('/api/v1.0/historical')
 def historical():
     start = request.args.get('start', type = str)
@@ -71,28 +71,28 @@ def historical():
     interval = request.args.get('interval', default = '1m', type = str)
     trading_pair = request.args.get('pair', default = 'BTCUSDT', type = str)
     # igotta make sure that end is ALWAYS after start
-    if start:
-        print(end, start)
-        e = end.replace(' ', '')
-        s = start.replace(' ', '')
-        if end == 'now':
-            data = cache.get('historical:' + s)
-        else:
-            data = cache.get('historical:' + s + ',' + e)
-        print(e, s)
-        if data is None:
-            print('no cache')
-            data = api.get_historical(start, end,  interval, trading_pair)
-            print(data)
-            if end == 'now':
-                cache.set('historical:' + s, data, timeout=60)
-            else:
-                cache.set('historical:' + s + ',' +  e, data, timeout=360)
-        else:
-            print('using cache')
+    if start and start[-2:] == '00': #make sure start exists and seconds are 00  
+#       print(end, start)
+#       e = end.replace(' ', '')
+#       s = start.replace(' ', '')
+#       if end == 'now':
+#           data = cache.get('historical:' + s)
+#       else:
+#           data = cache.get('historical:' + s + ',' + e)
+#       print(e, s)
+#       if data is None:
+#           print('no cache')
+#           data = api.get_historical(start, end,  interval, trading_pair)
+#           if end == 'now':
+#               cache.set('historical:' + s, data, timeout=60)
+#           else:
+#               cache.set('historical:' + s + ',' +  e, data, timeout=360)
+#       else:
+#           print('using cache')
+        data = api.get_historical(start, end,  interval, trading_pair)
         return jsonify({'historical' : data })
     else:
-        return jsonify('error: need to specify start param')
+        return jsonify('failure, invalid start or start not included')
 
 @app.route('/api/v1.0/login', methods = ['POST', 'GET'])
 def login():
