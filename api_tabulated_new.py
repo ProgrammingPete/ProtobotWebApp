@@ -17,9 +17,9 @@ def rawtab(filename = 'rawtab_BTCUSDT.csv', pair = 'BTCUSDT'):
     interval_seconds = 60
     #with lock:
     update_csv(filename, pair)
-#   date_now = date_to_milliseconds('now')/1000 + 4*3600
-#   date = datetime.utcfromtimestamp(date_now - 1140).strftime('%Y/%m/%d %H:%M:00')
-#   supported_pairs[pair] = get_from_csv(pair, date, 'now')
+    #date_now = date_to_milliseconds('now')//1000
+    #date = datetime.utcfromtimestamp(date_now - 1200 ).strftime('%Y/%m/%d %H:%M:00')
+    #supported_pairs[pair] = get_from_csv(pair, date, 'now')
     
     while True:
         count = count + 1
@@ -67,22 +67,26 @@ def rawtab(filename = 'rawtab_BTCUSDT.csv', pair = 'BTCUSDT'):
             supported_pairs[pair][- 1]['indicator']  = str(indicator)
             supported_pairs[pair][- 1]['10-SMA']  = 0
             supported_pairs[pair][- 1]['20-SMA']  = 0
-
         time.sleep(interval_seconds)
 
 
-def write_to_csv(entry,filename):
+def write_to_csv(entry,filename, append = True ):
         '''Rearranges columns in alphabetical order'''
+        #print(entry, filename)
         tab = pd.DataFrame(entry)
-        with  open(filename, 'a') as file:
-            tab.to_csv(file , mode= 'a', header= False )
+        if append:
+            with  open(filename, 'a') as file:
+                tab.to_csv(file , mode= 'a', header= False )
+        else:
+            with  open(filename, 'w') as file:
+                tab.to_csv(file , mode= 'w', header= False )
 
 def calcMovAvg(rawtable):
         averageMov_ten, averageMov_twenty, total = int(), int(), int()
         length = len(rawtable)
         j = length / 2
         for i, entry in enumerate(rawtable):
-            total += float(entry['Close_Price'])
+            total += float(entry['Open_Price'])
             if j == (i + 1):
                 #print("i // 2: ",  i / 2)
                 averageMov_ten = total / j
@@ -124,7 +128,7 @@ def get_historical(start_time, end_time, kline_length='1m', currency = "BTCUSDT"
     
     return  get_from_csv(currency, start_time, end_time) 
 
-def get_from_csv(pair, start, end):
+def get_from_csv(pair, start, end, not_all = False):
     pair = pair.upper()
     filename = 'rawtab_' + pair + '.csv'
     reverse_readline1 = reverse_readline(filename)
@@ -132,31 +136,38 @@ def get_from_csv(pair, start, end):
     found_end = False
     for kline in reverse_readline1:
         kline = kline.split(',')
-        #print(kline)
-#        print(start, kline[7])
+#       print(kline)
+        #print(start, kline[7])
         if kline[7] == end or found_end == True or end == 'now':
             found_end = True
             if kline[7] == start:
-                kline_conv = convert_format(kline, pair)
+                kline_conv = convert_format(kline, pair, not_all)
+                print(start, kline_conv)
                 table.insert(0, kline_conv)
                 break
             else:
-                kline_conv = convert_format(kline, pair)
+                kline_conv = convert_format(kline, pair, not_all)
                 #add to beginning of list by using .insert(0, kline_converted) function
                 table.insert(0, kline_conv)
     return table
 
-def convert_format(kline, pair):
+def convert_format(kline, pair, partial_labels = False):
     entry = dict()
-    entry['trading_pair'] = pair  
     #print(kline[0],type(kline[0]))
     if kline[0] == '0':
         # convert from our csv format to our format (list of dicts)
         # ,Close_Price,Close_time,High,Low,Number_Of_Trades,Open_Price,Open_Time,Quote_asset_volume,Taker_buy_base,Taker_buy_quote,Volume,trading_pair
-        for i, label in enumerate(sorted(labels)):
-            entry[label] = kline[i+1]
+        if partial_labels:
+        #   print(kline)
+            for i,label in enumerate(sorted(used_labels)):
+                entry[label] = kline[i+1]
+        else:
+            entry['trading_pair'] = pair  
+            for i, label in enumerate(sorted(labels)):
+                entry[label] = kline[i+1]
     else:
         #converts from binance kline format(from api) to our format (list of dictionaries)
+        entry['trading_pair'] = pair  
         kline[0] = datetime.utcfromtimestamp((kline[0])/1000).strftime('%Y/%m/%d %H:%M:%S')
         kline[6] = datetime.utcfromtimestamp((kline[6])/1000).strftime('%Y/%m/%d %H:%M:%S')
         for i, label in enumerate(labels):
@@ -226,4 +237,4 @@ lock = threading.Lock()
 labels = ['Open_Time','Open_Price','High', 'Low', 'Close_Price',
           'Volume', 'Close_time', 'Quote_asset_volume','Number_Of_Trades',
           'Taker_buy_base', 'Taker_buy_quote' ]
-
+used_labels = labels[0:7]
