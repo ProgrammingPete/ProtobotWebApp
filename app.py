@@ -13,7 +13,7 @@ If you change the schema, you will need to update the db file in a python shell:
         User.query
 """
 
-from flask import Flask, jsonify, redirect, url_for, request, render_template
+from flask import Flask, jsonify, redirect, url_for, request, render_template, send_file
 import api_tabulated_new as api
 import _thread
 import threading
@@ -57,10 +57,6 @@ def get_tasks():
         return jsonify({'Error' : 'unsupported'})
 
 
-@app.route('/api/v1.0/success/<name>')
-def success(name):
-   return 'welcome %s' % name
-
 # route example: /api/v1.0/historical?start=<STRING HERE>?end=<STRING HERE>
 #params can be in any order, but you have to include start param
 #try to define the strings as dates (Open_Time): 2019/04/10 14:40:00
@@ -93,6 +89,55 @@ def historical():
         return jsonify({'historical' : data })
     else:
         return jsonify('failure, invalid start or start not included')
+
+
+@app.route('/api/v1.0/btcOneMonth')
+def btcOneMonth():
+    try:
+        return send_file('prerendered/preBTCUSDT30.csv', attachment_filename='preBTCUSDT30.csv')
+    except Exception as e:
+        return str(e)
+
+
+@app.route('/api/v1.0/ethOneMonth')
+def ethOneMonth():
+    try:
+        return send_file('prerendered/preETHUSDT30.csv', attachment_filename='preETHUSDT30.csv')
+    except Exception as e:
+        return str(e)
+
+
+@app.route('/api/v1.0/btcOneWeek')
+def btcOneWeek():
+    try:
+        return send_file('prerendered/preBTCUSDT7.csv', attachment_filename='preBTCUSDT7.csv')
+    except Exception as e:
+        return str(e)
+
+
+@app.route('/api/v1.0/ethOneWeek')
+def ethOneWeek():
+    try:
+        return send_file('prerendered/preETHUSDT7.csv', attachment_filename='preETHUSDT7.csv')
+    except Exception as e:
+        return str(e)
+
+
+@app.route('/api/v1.0/btcOneDay')
+def btcOneDay():
+    try:
+        return send_file('prerendered/preBTCUSDT1.csv', attachment_filename='preBTCUSDT1.csv')
+    except Exception as e:
+        return str(e)
+
+
+@app.route('/api/v1.0/ethOneDay')
+def ethOneDay():
+    try:
+        return send_file('prerendered/preETHUSDT1.csv', attachment_filename='preETHUSDT1.csv')
+    except Exception as e:
+        return str(e)
+
 
 @app.route('/api/v1.0/login', methods = ['POST', 'GET'])
 def login():
