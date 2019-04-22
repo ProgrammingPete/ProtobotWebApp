@@ -79,7 +79,7 @@ def write_to_csv(entry,filename, append = True ):
                 tab.to_csv(file , mode= 'a', header= False )
         else:
             with  open(filename, 'w') as file:
-                tab.to_csv(file , mode= 'w', header= False )
+                tab.to_csv(file , mode= 'w', header= True )
 
 def calcMovAvg(rawtable):
         averageMov_ten, averageMov_twenty, total = int(), int(), int()
@@ -142,7 +142,7 @@ def get_from_csv(pair, start, end, not_all = False):
             found_end = True
             if kline[7] == start:
                 kline_conv = convert_format(kline, pair, not_all)
-                print(start, kline_conv)
+               #print(start, kline_conv)
                 table.insert(0, kline_conv)
                 break
             else:
@@ -153,13 +153,15 @@ def get_from_csv(pair, start, end, not_all = False):
 
 def convert_format(kline, pair, partial_labels = False):
     entry = dict()
-    #print(kline[0],type(kline[0]))
+   #print(kline[0],type(kline[0]))
     if kline[0] == '0':
         # convert from our csv format to our format (list of dicts)
         # ,Close_Price,Close_time,High,Low,Number_Of_Trades,Open_Price,Open_Time,Quote_asset_volume,Taker_buy_base,Taker_buy_quote,Volume,trading_pair
         if partial_labels:
         #   print(kline)
-            for i,label in enumerate(sorted(used_labels)):
+            del kline[5]#we do not want number of trades
+            for i,label in enumerate(used_labels):
+         #      print(kline, kline[5])  
                 entry[label] = kline[i+1]
         else:
             entry['trading_pair'] = pair  
@@ -237,4 +239,4 @@ lock = threading.Lock()
 labels = ['Open_Time','Open_Price','High', 'Low', 'Close_Price',
           'Volume', 'Close_time', 'Quote_asset_volume','Number_Of_Trades',
           'Taker_buy_base', 'Taker_buy_quote' ]
-used_labels = labels[0:7]
+used_labels = sorted(labels[0:7])
