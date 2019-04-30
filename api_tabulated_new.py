@@ -17,9 +17,14 @@ def rawtab(filename = 'rawtab_BTCUSDT.csv', pair = 'BTCUSDT'):
     interval_seconds = 60
     #with lock:
     update_csv(filename, pair)
-    #date_now = date_to_milliseconds('now')//1000
-    #date = datetime.utcfromtimestamp(date_now - 1200 ).strftime('%Y/%m/%d %H:%M:00')
-    #supported_pairs[pair] = get_from_csv(pair, date, 'now')
+    
+    from prerendr import update_panels
+    print('Updating Preprocessed CSVs', threading.current_thread().name, os.getpid())
+    update_panels(pair)
+    
+    date_now = date_to_milliseconds('now')//1000
+    date = datetime.utcfromtimestamp(date_now - 1140 ).strftime('%Y/%m/%d %H:%M:00')
+    supported_pairs[pair] = get_from_csv(pair, date, 'now')
     
     while True:
         count = count + 1
@@ -35,9 +40,10 @@ def rawtab(filename = 'rawtab_BTCUSDT.csv', pair = 'BTCUSDT'):
         
         # add entry to rawtab
         supported_pairs[pair].append(entry)
-        #print('csv', threading.current_thread().name)
+        print('csv', threading.current_thread().name, os.getpid())
         
         if len(supported_pairs[pair]) > 20:
+            #print(len(supported_pairs[pair]))
             entry = supported_pairs[pair].pop(0) # keep table at 20 entries (might remove this)
             if count >= 20: # save new klines to file every count seconds
                 count = 0
