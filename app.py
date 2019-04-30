@@ -15,6 +15,7 @@ If you change the schema, you will need to update the db file in a python shell:
 
 from flask import Flask, jsonify, redirect, url_for, request, render_template, send_file
 import api_tabulated_new as api
+from prerendr import update_panels
 import _thread
 import threading
 from flask_sqlalchemy import SQLAlchemy
@@ -110,7 +111,16 @@ def ethOneMonth():
 @app.route('/api/v1.0/btcOneWeek')
 def btcOneWeek():
     try:
-        return send_file('prerendered/preBTCUSDT7.csv', attachment_filename='preBTCUSDT7.csv')
+       #f  = cache.get('btcOneWeek')
+       #if f is None:
+       #    f = send_file('prerendered/preBTCUSDT7.csv', attachment_filename='preBTCUSDT7.csv')
+       #    print(f)
+       #    cache.set('btcOneWeek', f, timeout=360)
+       #    print('cached the file')
+       #else:
+       #    print('retreived from cached')
+       #return f 
+        return send_file('prerendered/preBTCUSDT30.csv', attachment_filename='preBTCUSDT30.csv')
     except Exception as e:
         return str(e)
 
