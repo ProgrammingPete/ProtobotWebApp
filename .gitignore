@@ -7,7 +7,7 @@ rawtab*.csv
 #this is for vim
 *.*.swp
 
-ProtobotWebApp/venv
+env/
 
 # User-specific files
 *.suo
