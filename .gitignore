@@ -7,7 +7,7 @@ rawtab*.csv
 #this is for vim
 *.*.swp
 
-env/
+/env
 
 # User-specific files
 *.suo
@@ -268,3 +268,10 @@ paket-files/
 __pycache__/
 *.pyc
 /ProtobotWebApp/env
+prerendered/preBTCUSDT1.csv
+prerendered/preBTCUSDT30.csv
+prerendered/preBTCUSDT7.csv
+prerendered/preBTCUSDT7.csv
+prerendered/preETHUSDT1.csv
+prerendered/preETHUSDT30.csv
+prerendered/preETHUSDT7.csv

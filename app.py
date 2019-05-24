@@ -22,7 +22,13 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.contrib.cache import MemcachedCache
 import os
 
+#cors issues. This is is only a temporary fix.
+from flask_cors import CORS
+
 app = Flask(__name__)
+
+CORS(app)
+
 
 
 basedir = os.path.abspath(os.path.dirname(__file__))
