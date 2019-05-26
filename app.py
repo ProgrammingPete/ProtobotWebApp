@@ -37,7 +37,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'ap
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False #signals the app every time a change is made to db
 db = SQLAlchemy(app)
 
-cache = MemcachedCache(['127.0.0.1:11211'])
+#cache = MemcachedCache(['127.0.0.1:11211'])
 
 class User(db.Model):
     """Class representation of a Client"""
@@ -187,6 +187,7 @@ if __name__ == '__main__':
     app.run(host='0.0.0.0', port='5678')
 else:
     #needed to place threads here to avoid duplicate threads for some crap reason
+    #i need to get rid of multithreading and go with multiprocessing for prod 
     for t in api.supported_pairs.keys():
         tab = threading.Thread(target= api.rawtab, name = str(t) + ' Thread', kwargs = {'filename': 'rawtab_' + str(t) + '.csv','pair' : t})
         tab.start()

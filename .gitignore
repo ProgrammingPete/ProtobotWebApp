@@ -3,7 +3,7 @@
 
 #ignore all rawtab csv files since they are massive
 rawtab*.csv
-
+*.db
 #this is for vim
 *.*.swp
 
