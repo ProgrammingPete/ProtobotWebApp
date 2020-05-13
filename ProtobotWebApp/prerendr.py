@@ -1,5 +1,5 @@
 from datetime import datetime
-from  api_tabulated_new import  write_to_csv, convert_format,  get_from_csv
+from  ProtobotWebApp.api_tabulated_new import  write_to_csv, convert_format,  get_from_csv
 from binance.helpers import date_to_milliseconds
 
 def update_panels(pair = 'BTCUSDT'):

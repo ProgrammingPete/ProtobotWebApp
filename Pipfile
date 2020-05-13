@@ -1,0 +1,22 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+python-binance = "*"
+bcrypt = "*"
+pandas = "*"
+locustio = "*"
+gunicorn = "*"
+pylibmc = "*"
+Flask = "*"
+Flask-SQLAlchemy = "*"
+Flask-Cors = "*"
+werkzeug = "*"
+werkzeug-contrib = "*"
+
+[requires]
+python_version = "3.8"

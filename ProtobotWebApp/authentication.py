@@ -1,8 +1,9 @@
 import os
 import bcrypt
 import sqlalchemy
-from app import User
-from app import db
+
+from ProtobotWebApp.models import User
+from ProtobotWebApp.mariaDB import db_session
 
 credentialStorage= {}
 
@@ -13,11 +14,12 @@ def createUser(userName, password):
     try:
         #add to database
         newUser = User(username = userName, hashvalue = hashValue, password_salt = salt)
-        db.session.add(newUser)
-        db.session.commit()
+        db_session.add_all([newUser])
+        db_session.commit()
+        print("User added to the database")
         return 1
-    except sqlalchemy.exc.IntegrityError:
-        print("error here")
+    except sqlalchemy.exc.IntegrityError as e:
+        print("Error when writing to DB" + e)
         return 0
 
 def validation(username, password):

@@ -1,57 +1,48 @@
-"""
-This is the script that will hold the Models and Routes for the application.
-This will be changed in the future, if the code becomes to messy.
-
-How to use the database: 
-If you change the schema, you will need to update the db file in a python shell:
-    from app import db
-    from app import User
-    db.drop_all()
-    db.create_all()
-
-    Make a query:
-        User.query
-"""
-
 from flask import Flask, jsonify, redirect, url_for, request, render_template, send_file
-import api_tabulated_new as api
-from prerendr import update_panels
+import ProtobotWebApp.api_tabulated_new as api
+from ProtobotWebApp.prerendr import update_panels
+from ProtobotWebApp.make_celery import make_celery
 import _thread
 import threading
-from flask_sqlalchemy import SQLAlchemy
-from werkzeug.contrib.cache import MemcachedCache
 import os
 
 #cors issues. This is is only a temporary fix.
-from flask_cors import CORS
+#from flask_cors import CORS
 
 app = Flask(__name__)
 
-CORS(app)
+app.config.from_object(__name__)
+app.config.update(dict(
+    JSONIFY_PRETTYPRINT_REGULAR=False
+))
+app.config.from_envvar('FLASK_SERVER_SETTINGS', silent=True)
+
+app.config.update(
+    CELERY_BROKER_URL='redis://localhost:6379',
+    CELERY_RESULT_BACKEND='redis://localhost:6379'
+)
+
+celery = make_celery(app)
+#CORS(app)
+
+#db stuff
+from ProtobotWebApp.mariaDB import db_session
+from ProtobotWebApp.models import User
 
 
 
 basedir = os.path.abspath(os.path.dirname(__file__))
-#configuration
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'app.db')
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False #signals the app every time a change is made to db
-db = SQLAlchemy(app)
 
-#cache = MemcachedCache(['127.0.0.1:11211'])
 
-class User(db.Model):
-    """Class representation of a Client"""
-    username = db.Column(db.String(120),  unique = True, primary_key = True, nullable= False)
-    hashvalue = db.Column(db.String(61),  nullable = False) #60 byte hash
-    password_salt = db.Column(db.String(30), nullable = False) # 29 byte salt
-
-    def __repr__(self): #tells how python should represent the object
-        return '<User {}>'.format(self.username)
-
-import authentication
+from  ProtobotWebApp.authentication import validation, createUser
 
 # Make the WSGI interface available at the top level so wfastcgi can get it.
 wsgi_app = app.wsgi_app
+
+
+@app.teardown_appcontext
+def shutdown_dbsession(exception=None):
+    db_session.remove()
 
 ## route example: /api/v1.0/update?pair=<STRING HERE>
 ## for now, can only be BTCUSDT or ETHUSDT
@@ -62,7 +53,6 @@ def get_tasks():
         return jsonify({'Trading_Info': api.supported_pairs[pair]})
     else:
         return jsonify({'Error' : 'unsupported'})
-
 
 # route example: /api/v1.0/historical?start=<STRING HERE>?end=<STRING HERE>
 #params can be in any order, but you have to include start param
@@ -75,23 +65,6 @@ def historical():
     trading_pair = request.args.get('pair', default = 'BTCUSDT', type = str)
     # igotta make sure that end is ALWAYS after start
     if start and start[-2:] == '00': #make sure start exists and seconds are 00  
-#       print(end, start)
-#       e = end.replace(' ', '')
-#       s = start.replace(' ', '')
-#       if end == 'now':
-#           data = cache.get('historical:' + s)
-#       else:
-#           data = cache.get('historical:' + s + ',' + e)
-#       print(e, s)
-#       if data is None:
-#           print('no cache')
-#           data = api.get_historical(start, end,  interval, trading_pair)
-#           if end == 'now':
-#               cache.set('historical:' + s, data, timeout=60)
-#           else:
-#               cache.set('historical:' + s + ',' +  e, data, timeout=360)
-#       else:
-#           print('using cache')
         data = api.get_historical(start, end,  interval, trading_pair)
         return jsonify({'historical' : data })
     else:
@@ -117,15 +90,6 @@ def ethOneMonth():
 @app.route('/api/v1.0/btcOneWeek')
 def btcOneWeek():
     try:
-       #f  = cache.get('btcOneWeek')
-       #if f is None:
-       #    f = send_file('prerendered/preBTCUSDT7.csv', attachment_filename='preBTCUSDT7.csv')
-       #    print(f)
-       #    cache.set('btcOneWeek', f, timeout=360)
-       #    print('cached the file')
-       #else:
-       #    print('retreived from cached')
-       #return f 
         return send_file('prerendered/preBTCUSDT30.csv', attachment_filename='preBTCUSDT30.csv')
     except Exception as e:
         return str(e)
@@ -161,7 +125,7 @@ def login():
       userdata = request.get_json()
       user = userdata.get('email')
       password = userdata.get('password')
-      if (authentication.validation(user, password)) == 1:
+      if (validation(user, password)) == 1:
         response = 'success'
         return jsonify(response)
       else:
@@ -175,20 +139,9 @@ def create():
     userdata = request.get_json()
     user = userdata.get('email')
     password = userdata.get('password')
-    if (authentication.createUser(user, password)) == 1:
+    if (createUser(user, password)) == 1:
         response = 'success'
         return jsonify(response)
     else:
         response = 'failure'
         return jsonify(response)
-
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port='5678')
-else:
-    #needed to place threads here to avoid duplicate threads for some crap reason
-    #i need to get rid of multithreading and go with multiprocessing for prod 
-    for t in api.supported_pairs.keys():
-        tab = threading.Thread(target= api.rawtab, name = str(t) + ' Thread', kwargs = {'filename': 'rawtab_' + str(t) + '.csv','pair' : t})
-        tab.start()
-    

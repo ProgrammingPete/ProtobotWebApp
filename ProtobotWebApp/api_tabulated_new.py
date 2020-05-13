@@ -43,7 +43,6 @@ def rawtab(filename = 'rawtab_BTCUSDT.csv', pair = 'BTCUSDT'):
         print('csv', threading.current_thread().name, os.getpid())
         
         if len(supported_pairs[pair]) > 20:
-            #print(len(supported_pairs[pair]))
             entry = supported_pairs[pair].pop(0) # keep table at 20 entries (might remove this)
             if count >= 20: # save new klines to file every count seconds
                 count = 0
@@ -78,7 +77,6 @@ def rawtab(filename = 'rawtab_BTCUSDT.csv', pair = 'BTCUSDT'):
 
 def write_to_csv(entry,filename, append = True ):
         '''Rearranges columns in alphabetical order'''
-        #print(entry, filename)
         tab = pd.DataFrame(entry)
         if append:
             with  open(filename, 'a') as file:
@@ -97,7 +95,6 @@ def calcMovAvg(rawtable):
                 #print("i // 2: ",  i / 2)
                 averageMov_ten = total / j
         averageMov_twenty = total / length
-        #print("Moving averages= 10: %f, 20: %f " % (averageMov_ten, averageMov_twenty))
         return averageMov_ten, averageMov_twenty
 
 def get_historical(start_time, end_time, kline_length='1m', currency = "BTCUSDT"):

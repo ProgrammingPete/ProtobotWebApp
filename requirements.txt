@@ -1,9 +1,11 @@
 flask
-python-binance
 bcrypt
 flask-sqlalchemy
+PyMySQL
 pandas
 flask_cors
 locustio
 gunicorn
 pylibmc
+yahoo-finance
+celery
